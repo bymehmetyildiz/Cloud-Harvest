@@ -25,6 +25,7 @@ public class PlayerState
     {
         player.animator.SetBool(animBoolName, true);
         triggerCalled = false;
+        stateTimer = 0f;
     }
 
     public virtual void Update()

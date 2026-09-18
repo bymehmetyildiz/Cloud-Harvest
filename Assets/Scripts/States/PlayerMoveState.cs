@@ -19,5 +19,10 @@ public class PlayerMoveState : PlayerState
     public override void Update()
     {
         base.Update();
+
+        player.ApplyMovement();
+
+        if (!player.IsMoving())
+            stateMachine.ChangeState(player.idleState);
     }
 }

@@ -1,3 +1,5 @@
+using JetBrains.Annotations;
+using Unity.Android.Gradle.Manifest;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -7,6 +9,15 @@ public class Player : MonoBehaviour
     [HideInInspector]
     public Animator animator;
     public CharacterController controller;
+    private InputSystem_Actions controls;
+    public Vector2 moveInput;
+
+    //Vairables
+    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float turnSpeed = 5f;
+    [SerializeField] private float gravity = -9.81f;
+    private float verticalVelocity;
+
 
     //States
     public PlayerIdleState idleState;
@@ -23,26 +34,34 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
+        
+        stateMachine = new StateMachine();
+        controls = new InputSystem_Actions();
         animator = GetComponent<Animator>();
         controller = GetComponent<CharacterController>();
-        stateMachine = new StateMachine();
+
+        controls.Player.Move.performed += context => moveInput = context.ReadValue<Vector2>();
+        controls.Player.Move.canceled += context => moveInput = Vector2.zero;
+
 
         //States
-        idleState = new PlayerIdleState(stateMachine, "idle", controller, this);
-        moveState = new PlayerMoveState(stateMachine, "move", controller, this);
-        interactState = new PlayerInteractState(stateMachine, "interact", controller, this);
-        chopState = new PlayerChopState(stateMachine, "chop", controller, this);
-        digState = new PlayerDigState(stateMachine, "dig", controller, this);
-        fishingState = new PlayerFishingState(stateMachine, "fishing", controller, this);
-        hammeringState = new PlayerHammeringState(stateMachine, "hammering", controller, this);
-        holdingState = new PlayerHoldingState(stateMachine, "holding", controller, this);
-        lockPickState = new PlayerLockPickState(stateMachine, "lockPick", controller, this);
-        pixaxeState = new PlayerPixaxeState(stateMachine, "pixaxe", controller, this);
-        workState = new PlayerWorkState(stateMachine, "work", controller, this);
+        idleState = new PlayerIdleState(stateMachine, "Idle", controller, this);
+        moveState = new PlayerMoveState(stateMachine, "Move", controller, this);
+        interactState = new PlayerInteractState(stateMachine, "Interact", controller, this);
+        chopState = new PlayerChopState(stateMachine, "Chop", controller, this);
+        digState = new PlayerDigState(stateMachine, "Dig", controller, this);
+        fishingState = new PlayerFishingState(stateMachine, "Fishing", controller, this);
+        hammeringState = new PlayerHammeringState(stateMachine, "Hammering", controller, this);
+        holdingState = new PlayerHoldingState(stateMachine, "Holding", controller, this);
+        lockPickState = new PlayerLockPickState(stateMachine, "Lockpick", controller, this);
+        pixaxeState = new PlayerPixaxeState(stateMachine, "Pixaxe", controller, this);
+        workState = new PlayerWorkState(stateMachine, "Work", controller, this);
     }
 
     void Start()
     {
+        
+
         stateMachine.Initialize(idleState);
     }
 
@@ -50,5 +69,64 @@ public class Player : MonoBehaviour
     void Update()
     {
         stateMachine.currentState.Update();
+
+        ApplyGravity();
     }
+
+    private void OnEnable()
+    {
+        controls.Enable();
+    }
+
+    private void OnDisable()
+    {
+        controls.Disable();
+    }
+
+    private void ApplyGravity()
+    {
+        if (controller.isGrounded && verticalVelocity < 0f)
+            verticalVelocity = -2f;
+        else
+            verticalVelocity += gravity * Time.deltaTime;
+
+        controller.Move(
+            Vector3.up * verticalVelocity * Time.deltaTime
+        );
+    }
+
+    public void ApplyMovement()
+    {
+        Vector3 move = new Vector3(
+            moveInput.x,
+            0f,
+            moveInput.y
+        );
+
+        if (move.sqrMagnitude > 1f)
+            move.Normalize();
+
+        Quaternion targetRotation = Quaternion.LookRotation(move);
+        move.Normalize();
+
+        if(IsMoving())
+            transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            targetRotation,
+            turnSpeed * Time.deltaTime
+        );
+
+        controller.Move(move * moveSpeed * Time.deltaTime);
+    }
+
+    public bool IsMoving()
+    {
+        return moveInput.sqrMagnitude > 0.01f;
+    }
+
+
+
 }
+
+
+
