@@ -37,7 +37,7 @@ public class Player : MonoBehaviour
         
         stateMachine = new StateMachine();
         controls = new InputSystem_Actions();
-        animator = GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
         controller = GetComponent<CharacterController>();
 
         controls.Player.Move.performed += context => moveInput = context.ReadValue<Vector2>();
