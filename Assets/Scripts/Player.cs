@@ -1,5 +1,4 @@
 using JetBrains.Annotations;
-using Unity.Android.Gradle.Manifest;
 using UnityEngine;
 
 public class Player : MonoBehaviour
