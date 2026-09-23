@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 9e324277fc0152f47867e01648ad7f94
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 112000000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 135258
+  packageName: Toony Tiny RTS Set
+  packageVersion: 1.5
+  assetPath: Assets/ToonyTinyPeople/TT_RTS/TT_RTS_Standard/sample_scene/TT_RTS_sample_scene/LightingData.asset
+  uploadId: 981000
